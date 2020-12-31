@@ -1,6 +1,14 @@
 ## asm-register
 
+## Install
+```sh
+$ npm install asm-register
+```
+
+## Use
 ```ts
+import { AsmRegister } from 'asm-register'; 
+
 const r = new AsmRegister();
 r.rax = 0xaaffeeddcc;
 r.rax // 0xaaffeeddcc
