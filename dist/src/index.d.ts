@@ -34,6 +34,7 @@ export declare class AsmRegister {
     private _ymm13;
     private _ymm14;
     private _ymm15;
+    private _rflag;
     private getFloat64;
     private setFloat64;
     private getFloat32;
@@ -326,5 +327,26 @@ export declare class AsmRegister {
     set xmm14(value: number);
     get xmm15(): number;
     set xmm15(value: number);
+    get rflag(): number;
+    get eflag(): number;
+    get flag(): number;
+    get CF(): 0 | 1;
+    set CF(value: 0 | 1);
+    get PF(): 0 | 1;
+    set PF(value: 0 | 1);
+    get AF(): 0 | 1;
+    set AF(value: 0 | 1);
+    get ZF(): 0 | 1;
+    set ZF(value: 0 | 1);
+    get SF(): 0 | 1;
+    set SF(value: 0 | 1);
+    get TF(): 0 | 1;
+    set TF(value: 0 | 1);
+    get IF(): 0 | 1;
+    set IF(value: 0 | 1);
+    get DF(): 0 | 1;
+    set DF(value: 0 | 1);
+    get OF(): 0 | 1;
+    set OF(value: 0 | 1);
 }
 //# sourceMappingURL=index.d.ts.map

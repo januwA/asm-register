@@ -1,39 +1,47 @@
+const X64_SIZE = 8;
+const YMM_SIZE = 256 / 8;
+
+function alloc(size: number) {
+  return new DataView(new ArrayBuffer(size));
+}
+
 export class AsmRegister {
   constructor(public readonly littleEndian: boolean = false) {}
 
-  private _rax: DataView = new DataView(new ArrayBuffer(8));
-  private _rbx: DataView = new DataView(new ArrayBuffer(8));
-  private _rcx: DataView = new DataView(new ArrayBuffer(8));
-  private _rdx: DataView = new DataView(new ArrayBuffer(8));
-  private _rsi: DataView = new DataView(new ArrayBuffer(8));
-  private _rdi: DataView = new DataView(new ArrayBuffer(8));
-  private _rbp: DataView = new DataView(new ArrayBuffer(8));
-  private _rsp: DataView = new DataView(new ArrayBuffer(8));
-  private _rip: DataView = new DataView(new ArrayBuffer(8));
-  private _r8: DataView = new DataView(new ArrayBuffer(8));
-  private _r9: DataView = new DataView(new ArrayBuffer(8));
-  private _r10: DataView = new DataView(new ArrayBuffer(8));
-  private _r11: DataView = new DataView(new ArrayBuffer(8));
-  private _r12: DataView = new DataView(new ArrayBuffer(8));
-  private _r13: DataView = new DataView(new ArrayBuffer(8));
-  private _r14: DataView = new DataView(new ArrayBuffer(8));
-  private _r15: DataView = new DataView(new ArrayBuffer(8));
-  private _ymm0: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm1: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm2: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm3: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm4: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm5: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm6: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm7: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm8: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm9: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm10: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm11: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm12: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm13: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm14: DataView = new DataView(new ArrayBuffer(256 / 8));
-  private _ymm15: DataView = new DataView(new ArrayBuffer(256 / 8));
+  private _rax: DataView = alloc(X64_SIZE);
+  private _rbx: DataView = alloc(X64_SIZE);
+  private _rcx: DataView = alloc(X64_SIZE);
+  private _rdx: DataView = alloc(X64_SIZE);
+  private _rsi: DataView = alloc(X64_SIZE);
+  private _rdi: DataView = alloc(X64_SIZE);
+  private _rbp: DataView = alloc(X64_SIZE);
+  private _rsp: DataView = alloc(X64_SIZE);
+  private _rip: DataView = alloc(X64_SIZE);
+  private _r8: DataView = alloc(X64_SIZE);
+  private _r9: DataView = alloc(X64_SIZE);
+  private _r10: DataView = alloc(X64_SIZE);
+  private _r11: DataView = alloc(X64_SIZE);
+  private _r12: DataView = alloc(X64_SIZE);
+  private _r13: DataView = alloc(X64_SIZE);
+  private _r14: DataView = alloc(X64_SIZE);
+  private _r15: DataView = alloc(X64_SIZE);
+  private _ymm0: DataView = alloc(YMM_SIZE);
+  private _ymm1: DataView = alloc(YMM_SIZE);
+  private _ymm2: DataView = alloc(YMM_SIZE);
+  private _ymm3: DataView = alloc(YMM_SIZE);
+  private _ymm4: DataView = alloc(YMM_SIZE);
+  private _ymm5: DataView = alloc(YMM_SIZE);
+  private _ymm6: DataView = alloc(YMM_SIZE);
+  private _ymm7: DataView = alloc(YMM_SIZE);
+  private _ymm8: DataView = alloc(YMM_SIZE);
+  private _ymm9: DataView = alloc(YMM_SIZE);
+  private _ymm10: DataView = alloc(YMM_SIZE);
+  private _ymm11: DataView = alloc(YMM_SIZE);
+  private _ymm12: DataView = alloc(YMM_SIZE);
+  private _ymm13: DataView = alloc(YMM_SIZE);
+  private _ymm14: DataView = alloc(YMM_SIZE);
+  private _ymm15: DataView = alloc(YMM_SIZE);
+  private _rflag: DataView = alloc(X64_SIZE);
 
   private getFloat64(r: DataView) {
     return r.getFloat64(0, this.littleEndian);
@@ -937,5 +945,88 @@ export class AsmRegister {
   }
   set xmm15(value) {
     this.setFloat32(this._ymm15, value);
+  }
+
+  /**
+   * https://en.wikipedia.org/wiki/FLAGS_register
+   */
+  get rflag() {
+    return this.get64(this._rflag);
+  }
+  get eflag() {
+    return this.get32(this._rflag);
+  }
+  get flag() {
+    return this.get16(this._rflag);
+  }
+
+  get CF() {
+    return ((this.rflag & 0x0001) >> 0) as 0 | 1;
+  }
+  set CF(value: 0 | 1) {
+    if (value === this.CF) return;
+    this.set64(this._rflag, this.rflag ^ 1);
+  }
+  get PF() {
+    return ((this.rflag & 0x0004) >> 2) as 0 | 1;
+  }
+  set PF(value: 0 | 1) {
+    if (value === this.PF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 2));
+  }
+  get AF() {
+    return ((this.rflag & 0x0010) >> 4) as 0 | 1;
+  }
+  set AF(value: 0 | 1) {
+    if (value === this.AF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 4));
+  }
+
+  get ZF() {
+    return ((this.rflag & 0x0040) >> 6) as 0 | 1;
+  }
+  set ZF(value: 0 | 1) {
+    if (value === this.ZF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 6));
+  }
+
+  get SF() {
+    return ((this.rflag & 0x0080) >> 7) as 0 | 1;
+  }
+  set SF(value: 0 | 1) {
+    if (value === this.SF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 7));
+  }
+
+  get TF() {
+    return ((this.rflag & 0x0100) >> 8) as 0 | 1;
+  }
+  set TF(value: 0 | 1) {
+    if (value === this.TF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 8));
+  }
+
+  get IF() {
+    return ((this.rflag & 0x0200) >> 9) as 0 | 1;
+  }
+  set IF(value: 0 | 1) {
+    if (value === this.IF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 9));
+  }
+
+  get DF() {
+    return ((this.rflag & 0x0400) >> 10) as 0 | 1;
+  }
+  set DF(value: 0 | 1) {
+    if (value === this.DF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 10));
+  }
+
+  get OF() {
+    return ((this.rflag & 0x0800) >> 11) as 0 | 1;
+  }
+  set OF(value: 0 | 1) {
+    if (value === this.OF) return;
+    this.set64(this._rflag, this.rflag ^ (1 << 11));
   }
 }

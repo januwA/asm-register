@@ -149,4 +149,17 @@ describe("test Register", () => {
     r.ymm0 = 1.23;
     expect(r.ymm0).toBe(1.23);
   });
+
+  it("test rflag", () => {
+    const r = new AsmRegister();
+    r.ZF = 1;
+    expect(r.rflag).toBe(0x0040);
+
+    r.ZF = 0;
+    expect(r.rflag).toBe(0);
+
+    r.CF = 1;
+    r.AF = 1;
+    expect(r.rflag).toBe(0x11);
+  });
 });
